@@ -12,6 +12,8 @@ use Fulll\App\RegisterVehicleHandler;
 use Fulll\Domain\Vehicle;
 use Fulll\Domain\Fleet;
 use Fulll\Infra\InMemoryFleetRepository;
+use Fulll\App\ParkVehicleCommand;
+use Fulll\App\ParkVehicleHandler;
 
 class FeatureContext implements Context
 {
@@ -29,6 +31,9 @@ class FeatureContext implements Context
 
     /** @var Fleet The fleet belonging to another user. */
     private Fleet $anotherFleet;
+
+    /** @var \Fulll\Domain\Location The location for the current scenario. */
+    private \Fulll\Domain\Location $location;
 
     public function __construct()
     {
@@ -59,7 +64,7 @@ class FeatureContext implements Context
     #[Then('this vehicle should be part of my vehicle fleet')]
     public function thisVehicleShouldBePartOfMyVehicleFleet(): void
     {
-       // Retrieve the fleet from the repository to verify the vehicle registration.
+        // Retrieve the fleet from the repository to verify the vehicle registration.
         $fleetFromRepository = $this->fleetRepository->findById($this->fleet->getId());
 
         if (!$fleetFromRepository->hasVehicle($this->vehicle)) {
@@ -111,10 +116,10 @@ class FeatureContext implements Context
     public function theFleetOfAnotherUser(): void
     {
         // We create a new Fleet instance, just like for the main user
-    $this->anotherFleet = new Fleet();
-    
-    // And we save it to the repository so the handler can find it
-    $this->fleetRepository->save($this->anotherFleet);
+        $this->anotherFleet = new Fleet();
+
+        // And we save it to the repository so the handler can find it
+        $this->fleetRepository->save($this->anotherFleet);
     }
 
     #[Given('this vehicle has been registered into the other user\'s fleet')]
@@ -131,6 +136,93 @@ class FeatureContext implements Context
         $handler->handle($command);
     }
 
+    #[Given('a location')]
+    public function aLocation(): void
+    {
+        // For the test, we create a location with sample GPS coordinates.
+        $this->location = new \Fulll\Domain\Location(43.2839533, 5.3712377); // Coordinates for Notre Dame de la Garde, Marseille
+    }
+
+    #[When('I park my vehicle at this location')]
+    public function iParkMyVehicleAtThisLocation(): void
+    {
+        // Call the private helper method to perform the parking action.
+        $this->parkTheVehicle();
+    }
+
+    #[Then('the known location of my vehicle should verify this location')]
+    public function theKnownLocationOfMyVehicleShouldVerifyThisLocation(): void
+    {
+        // 1. To be sure, we retrieve the fleet's state from our persistence layer.
+        $fleetFromRepository = $this->fleetRepository->findById($this->fleet->getId());
+
+        // 2. We ask the fleet for the vehicle's last known location.
+        $knownLocation = $fleetFromRepository->getVehicleLocation($this->vehicle->getPlateNumber());
+
+        // 3. We verify that a location was actually found.
+        if ($knownLocation === null) {
+            throw new \RuntimeException('The vehicle location could not be found in the fleet.');
+        }
+
+        // 4. We assert that the known location's coordinates match the location from our scenario.
+        if (
+            $knownLocation->getLatitude() !== $this->location->getLatitude() ||
+            $knownLocation->getLongitude() !== $this->location->getLongitude()
+        ) {
+            throw new \RuntimeException(
+                sprintf(
+                    'The vehicle is at the wrong location. Expected lat %s, lon %s but got lat %s, lon %s.',
+                    $this->location->getLatitude(),
+                    $this->location->getLongitude(),
+                    $knownLocation->getLatitude(),
+                    $knownLocation->getLongitude()
+                )
+            );
+        }
+    }
+
+    #[Given('my vehicle has been parked into this location')]
+    public function myVehicleHasBeenParkedIntoThisLocation(): void
+    {
+        // Call the private helper method to perform the parking action.
+        $this->parkTheVehicle();
+    }
+
+    #[When('I try to park my vehicle at this location')]
+    public function iTryToParkMyVehicleAtThisLocation(): void
+    {
+        try {
+            // We use our helper method to attempt the action
+            $this->parkTheVehicle();
+        } catch (\Exception $e) {
+            // We expect an exception, so we catch it and store it for verification.
+            $this->caughtException = $e;
+        }
+    }
+
+    #[Then('I should be informed that my vehicle is already parked at this location')]
+    public function iShouldBeInformedThatMyVehicleIsAlreadyParkedAtThisLocation(): void
+    {
+        // 1. Assert that an exception was caught.
+        if ($this->caughtException === null) {
+            throw new \RuntimeException('Expected an exception to be thrown, but it was not.');
+        }
+
+        // 2. Assert that the exception message is the one we expect.
+        $expectedMessage = 'This vehicle is already parked at this location.';
+        if ($this->caughtException->getMessage() !== $expectedMessage) {
+            throw new \RuntimeException(
+                sprintf(
+                    "The exception message is incorrect. Expected '%s', got '%s'.",
+                    $expectedMessage,
+                    $this->caughtException->getMessage()
+                )
+            );
+        }
+    }
+
+    // Private helper methods 
+
     /**
      * Helper method to perform the vehicle registration logic.
      * Avoids code duplication between steps.
@@ -143,6 +235,24 @@ class FeatureContext implements Context
         );
 
         $handler = new RegisterVehicleHandler($this->fleetRepository);
+
+        $handler->handle($command);
+    }
+
+    /**
+     * Helper method to perform the vehicle parking logic.
+     * Avoids code duplication between steps.
+     */
+    private function parkTheVehicle(): void
+    {
+        $command = new ParkVehicleCommand(
+            $this->fleet->getId(),
+            $this->vehicle->getPlateNumber(),
+            $this->location->getLatitude(),
+            $this->location->getLongitude()
+        );
+
+        $handler = new ParkVehicleHandler($this->fleetRepository);
 
         $handler->handle($command);
     }

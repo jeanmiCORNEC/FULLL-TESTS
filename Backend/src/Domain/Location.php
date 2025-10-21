@@ -1,0 +1,27 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Fulll\Domain;
+
+/**
+ * Represents a geographical location (Value Object).
+ * It is defined by its coordinates and has no unique identity.
+ */
+class Location
+{
+    public function __construct(
+        private float $latitude,
+        private float $longitude
+    ) {}
+
+    public function getLatitude(): float
+    {
+        return $this->latitude;
+    }
+
+    public function getLongitude(): float
+    {
+        return $this->longitude;
+    }
+}
