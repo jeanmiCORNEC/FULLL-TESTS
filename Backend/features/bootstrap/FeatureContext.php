@@ -222,7 +222,7 @@ class FeatureContext implements Context
         }
     }
 
-    // Private helper methods 
+    // Private helper methods
 
     /**
      * Helper method to perform the vehicle registration logic.

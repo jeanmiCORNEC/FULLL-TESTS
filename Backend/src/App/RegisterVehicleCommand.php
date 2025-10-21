@@ -13,7 +13,8 @@ class RegisterVehicleCommand
     public function __construct(
         private string $fleetId,
         private string $vehiclePlateNumber
-    ) {}
+    ) {
+    }
 
     public function getFleetId(): string
     {

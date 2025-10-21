@@ -22,7 +22,7 @@ class ParkVehicleHandler
      * Executes the command.
      */
     public function handle(ParkVehicleCommand $command): void
-{
+    {
         // 1. Retrieve the fleet
         $fleet = $this->fleetRepository->findById($command->getFleetId());
         if ($fleet === null) {
@@ -40,5 +40,5 @@ class ParkVehicleHandler
 
         // 4. Save the changes
         $this->fleetRepository->save($fleet);
-}
+    }
 }

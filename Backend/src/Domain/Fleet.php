@@ -21,7 +21,9 @@ class Fleet
     /** @var Location[] Keyed by vehicle plate number. */
     private array $vehicleLocations = [];
 
-    private function __construct() {}
+    private function __construct()
+    {
+    }
 
     /**
      * Named constructor to create a brand new fleet.

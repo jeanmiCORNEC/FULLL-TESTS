@@ -26,7 +26,7 @@ class CreateFleetHandler
     {
         // For now, the user ID is not stored, but in a real app it would be.
         $fleet = Fleet::createForUser($command->getUserId());
-        
+
         $this->fleetRepository->save($fleet);
 
         return $fleet->getId();

@@ -12,8 +12,6 @@ use Fulll\Domain\Vehicle;
  */
 class RegisterVehicleHandler
 {
-
-
     public function __construct(private FleetRepositoryInterface $fleetRepository)
     {
     }

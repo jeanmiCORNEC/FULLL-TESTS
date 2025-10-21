@@ -14,15 +14,12 @@ use Fulll\App\CreateFleetHandler;
 use Fulll\Infra\PostgresFleetRepository;
 use Fulll\Domain\FleetRepositoryInterface;
 
-
-
 #[AsCommand(
     name: 'create',
     description: 'Creates a new fleet for a given user.'
 )]
 class CreateFleetCommand extends Command
 {
-
     // Inject the dependency via the constructor
     public function __construct(private FleetRepositoryInterface $fleetRepository)
     {
@@ -37,8 +34,8 @@ class CreateFleetCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        
-        
+
+
 
         // 1. Get the user ID from the command line argument.
         $userId = $input->getArgument('userId');

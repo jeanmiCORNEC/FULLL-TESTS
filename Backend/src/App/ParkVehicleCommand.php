@@ -14,7 +14,8 @@ class ParkVehicleCommand
         private string $vehiclePlateNumber,
         private float $latitude,
         private float $longitude
-    ) {}
+    ) {
+    }
 
     public function getFleetId(): string
     {
