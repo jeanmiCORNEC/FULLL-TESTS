@@ -7,13 +7,14 @@ namespace Fulll\App;
 use Fulll\Infra\InMemoryFleetRepository;
 use Fulll\Domain\Vehicle;
 use Fulll\Domain\Location;
+use Fulll\Domain\FleetRepositoryInterface;
 
 /**
  * Handles the command to park a vehicle.
  */
 class ParkVehicleHandler
 {
-    public function __construct(private InMemoryFleetRepository $fleetRepository)
+    public function __construct(private FleetRepositoryInterface $fleetRepository)
     {
     }
 

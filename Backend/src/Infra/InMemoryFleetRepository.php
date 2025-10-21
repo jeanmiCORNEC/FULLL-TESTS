@@ -5,11 +5,12 @@ declare(strict_types=1);
 namespace Fulll\Infra;
 
 use Fulll\Domain\Fleet;
+use Fulll\Domain\FleetRepositoryInterface;
 
 /**
  * In-memory implementation of a fleet repository for testing purposes.
  */
-class InMemoryFleetRepository
+class InMemoryFleetRepository implements FleetRepositoryInterface
 {
     /** @var Fleet[] */
     private array $fleets = [];

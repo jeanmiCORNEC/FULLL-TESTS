@@ -4,10 +4,16 @@ declare(strict_types=1);
 
 namespace Fulll\Domain;
 
+use Fulll\Domain\Vehicle;
+use Fulll\Domain\Location;
+
 class Fleet
 {
     /** @var string The unique identifier for this fleet. */
     private string $id;
+
+    /** @var string The ID of the user who owns this fleet. */
+    private string $userId;
 
     /** @var Vehicle[] */
     private array $vehicles = [];
@@ -15,17 +21,44 @@ class Fleet
     /** @var Location[] Keyed by vehicle plate number. */
     private array $vehicleLocations = [];
 
-    public function __construct()
+    private function __construct() {}
+
+    /**
+     * Named constructor to create a brand new fleet.
+     */
+    public static function createForUser(string $userId): self
     {
-        // For the purpose of this exercise, a simple unique ID is sufficient.
-        // In a real application, this would be a UUID.
-        $this->id = uniqid('fleet-', true);
+        $fleet = new self();
+        $fleet->id = uniqid('fleet_');
+        $fleet->userId = $userId;
+        $fleet->vehicles = [];
+        $fleet->vehicleLocations = [];
+        return $fleet;
+    }
+
+    /**
+     * Named constructor to rehydrate a fleet from persistence.
+     */
+    public static function fromState(string $id, string $userId): self
+    {
+        $fleet = new self();
+        $fleet->id = $id;
+        $fleet->userId = $userId;
+        $fleet->vehicles = [];       // We'll need to load these later
+        $fleet->vehicleLocations = []; // We'll need to load these later
+        return $fleet;
     }
 
     public function getId(): string
     {
         return $this->id;
     }
+
+    public function getUserId(): string
+    {
+        return $this->userId;
+    }
+
 
     public function registerVehicle(Vehicle $vehicle): void
     {
@@ -83,5 +116,22 @@ class Fleet
     public function getVehicleLocation(string $vehiclePlateNumber): ?Location
     {
         return $this->vehicleLocations[$vehiclePlateNumber] ?? null;
+    }
+
+    /**
+     * @return Vehicle[]
+     */
+    public function getVehicles(): array
+    {
+        return $this->vehicles;
+    }
+
+    /**
+     * Internal method to add a vehicle during rehydration.
+     * Bypasses business rules like checking for duplicates.
+     */
+    public function addVehicle(Vehicle $vehicle): void
+    {
+        $this->vehicles[] = $vehicle;
     }
 }

@@ -11,6 +11,7 @@ use Fulll\App\RegisterVehicleCommand;
 use Fulll\App\RegisterVehicleHandler;
 use Fulll\Domain\Vehicle;
 use Fulll\Domain\Fleet;
+use Fulll\Domain\Location;
 use Fulll\Infra\InMemoryFleetRepository;
 use Fulll\App\ParkVehicleCommand;
 use Fulll\App\ParkVehicleHandler;
@@ -44,14 +45,14 @@ class FeatureContext implements Context
     #[Given('my fleet')]
     public function myFleet(): void
     {
-        $this->fleet = new \Fulll\Domain\Fleet();
+        $this->fleet = Fleet::createForUser('user-1');
         $this->fleetRepository->save($this->fleet);
     }
 
     #[Given('a vehicle')]
     public function aVehicle(): void
     {
-        $this->vehicle = new \Fulll\Domain\Vehicle('X-WING-99');
+        $this->vehicle = new Vehicle('X-WING-99');
     }
 
     #[When('I register this vehicle into my fleet')]
@@ -116,7 +117,7 @@ class FeatureContext implements Context
     public function theFleetOfAnotherUser(): void
     {
         // We create a new Fleet instance, just like for the main user
-        $this->anotherFleet = new Fleet();
+        $this->anotherFleet = Fleet::createForUser('user-2');
 
         // And we save it to the repository so the handler can find it
         $this->fleetRepository->save($this->anotherFleet);
@@ -140,7 +141,7 @@ class FeatureContext implements Context
     public function aLocation(): void
     {
         // For the test, we create a location with sample GPS coordinates.
-        $this->location = new \Fulll\Domain\Location(43.2839533, 5.3712377); // Coordinates for Notre Dame de la Garde, Marseille
+        $this->location = new Location(43.2839533, 5.3712377); // Coordinates for Notre Dame de la Garde, Marseille
     }
 
     #[When('I park my vehicle at this location')]

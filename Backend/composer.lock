@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "a2f62f3e989d27d2bdbc82771330dce5",
+    "content-hash": "81cedc139e5ee7fafd3912c67bff3dd6",
     "packages": [
         {
             "name": "behat/behat",

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Fulll\App;
 
-use Fulll\Infra\InMemoryFleetRepository;
+use Fulll\Domain\FleetRepositoryInterface;
 use Fulll\Domain\Vehicle;
 
 /**
@@ -12,12 +12,10 @@ use Fulll\Domain\Vehicle;
  */
 class RegisterVehicleHandler
 {
-    /** @var InMemoryFleetRepository Repository to manage fleets.*/
-     private InMemoryFleetRepository $fleetRepository;
 
-    public function __construct(InMemoryFleetRepository $fleetRepository)
+
+    public function __construct(private FleetRepositoryInterface $fleetRepository)
     {
-        $this->fleetRepository = $fleetRepository;
     }
 
     /**

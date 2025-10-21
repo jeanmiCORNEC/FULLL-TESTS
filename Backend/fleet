@@ -1,0 +1,25 @@
+#!/usr/bin/env php
+<?php
+// fleet
+
+require __DIR__ . '/vendor/autoload.php';
+
+use Fulll\Infra\PostgresFleetRepository;
+use Fulll\UI\CLI\CreateFleetCommand;
+use Fulll\UI\CLI\RegisterVehicleCliCommand;
+use Fulll\UI\CLI\LocalizeVehicleCliCommand;
+use Symfony\Component\Console\Application;
+
+// --- Composition Root ---
+// This is where we build all our services.
+$fleetRepository = new PostgresFleetRepository();
+// --- End of Composition Root ---
+
+$application = new Application();
+
+// Register our commands, injecting the dependencies they need
+$application->add(new CreateFleetCommand($fleetRepository));
+$application->add(new RegisterVehicleCliCommand($fleetRepository));
+$application->add(new LocalizeVehicleCliCommand($fleetRepository)); 
+
+$application->run();
